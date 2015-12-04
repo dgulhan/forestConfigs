@@ -29,7 +29,7 @@ process.HiForest.HiForestVersion = cms.untracked.string(version)
 process.source = cms.Source("PoolSource",
                             duplicateCheckMode = cms.untracked.string("noDuplicateCheck"),
                             fileNames = cms.untracked.vstring(
-    "file:step3_10.root"
+    "file:step3_1000_1_o3a.root"
     ))
 
 # Number of events we want to process, -1 = all events
@@ -58,7 +58,7 @@ process.load('FWCore.MessageService.MessageLogger_cfi')
 
 from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 # process.GlobalTag = GlobalTag(process.GlobalTag, 'MCRUN2_74_V8B', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run1_data', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')
 
 # process.GlobalTag.toGet = cms.VPSet(
 # cms.PSet(record = cms.string('PTrackerParametersRcd'),
@@ -213,8 +213,8 @@ process.hiTracks.cut = cms.string('quality("highPurity")')
 process.ppTrack.trackSrc = cms.InputTag("generalTracks")
 process.ppTrack.mvaSrc = cms.string('generalTracks')
 
-process.ppTrack.doSimVertex = True
-process.ppTrack.doSimTrack = True
+process.ppTrack.doSimVertex = False
+process.ppTrack.doSimTrack = False
 
 process.load("SimTracker.TrackAssociation.trackingParticleRecoTrackAsssociation_cff")
 process.tpRecoAssocGeneralTracks = process.trackingParticleRecoTrackAsssociation.clone()
@@ -248,7 +248,13 @@ process.akHiGenJets = cms.Sequence(
 						
 process.load('HeavyIonsAnalysis.EventAnalysis.hltanalysis_cff')
 
+process.HiGenParticleAna.stableOnly = False
+process.HiGenParticleAna.ptMin = cms.untracked.double(2)
+process.HiGenParticleAna.genParticleSrc = cms.untracked.InputTag("genParticles")
+process.HiGenParticleAna.doHI = False
+
 process.ana_step = cms.Path(process.hltanalysis *
+                            process.HiGenParticleAna+
                             process.hiReRecoPFJets+
                             process.hiReRecoCaloJets+
 							              process.akHiGenJets  +
@@ -257,7 +263,7 @@ process.ana_step = cms.Path(process.hltanalysis *
                             process.ggHiNtuplizerGED +
                             process.pfcandAnalyzer +
    						              process.quickTrackAssociatorByHits +
-							              process.tpRecoAssocGeneralTracks +
+							              # process.tpRecoAssocGeneralTracks +
                             process.HiForest +
                             process.ppTrack
 							)
